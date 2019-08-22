@@ -1,20 +1,20 @@
 /**
  * Challenge:
  * 
- * Get the second subscriber to receive values 2 and 3, without changing any positioning of the code
- * And get the first subscriber to receive the value 200 before any other values
+ * Emit the values 1, 2 and 3. The second subscriber currently only gets values 2 and 3. 
+ * Allow the second subscriber to receive all of the emitted values (1, 2 and 3).
  * 
- * Log the following to the console:
- * first subscriber: 200
+ * Should log the following to the console:
  * first subscriber: 1
  * first subscriber: 2
+ * second subscriber: 1
  * second subscriber: 2
  * first subscriber: 3
  * second subscriber: 3
  */
 
 import { Component } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { ReplaySubject } from 'rxjs/ReplaySubject';
 
 @Component({
   selector: 'app-root',
@@ -27,10 +27,9 @@ export class AppComponent {
 
   ngOnInit() {
     /**
-     * BehaviorSubject (weird American spelling) requires a starting value
-     * The first emitted value will be 200
+     * Even after completing, a `ReplaySubject` will save all of the emitted values and replay them to each of its subscribers.
      */
-    this.subscriber$ = new BehaviorSubject(200);
+    this.subscriber$ = new ReplaySubject();
 
     this.subscriber$.subscribe(
       value => console.log('first subscriber:', value),
@@ -47,11 +46,6 @@ export class AppComponent {
       () => console.log('second subscriber:', 'completed!'),
     );
 
-    /** 
-     * As soon as we create our second subscription,
-     * we want to subscribe to to not only new values being emitted after subscription,
-     * but also the last value that was emitted before we started subscribing (in this case, the value 2)
-     */
     this.subscriber$.next(3);
   }
 
