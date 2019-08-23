@@ -1,20 +1,14 @@
 /**
  * Challenge:
  * 
- * Emit the values 1, 2 and 3. The second subscriber currently only gets values 2 and 3. 
- * Allow the second subscriber to receive all of the emitted values (1, 2 and 3).
+ * Every second, log the values 0-4 to the console, then complete the observable stream.
  * 
- * Should log the following to the console:
- * first subscriber: 1
- * first subscriber: 2
- * second subscriber: 1
- * second subscriber: 2
- * first subscriber: 3
- * second subscriber: 3
  */
 
 import { Component } from '@angular/core';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/interval';
+import 'rxjs/add/operator/take';
 
 @Component({
   selector: 'app-root',
@@ -23,33 +17,25 @@ import { ReplaySubject } from 'rxjs/ReplaySubject';
 })
 export class AppComponent {
   title = 'app';
-  subscriber$;
+
+  numbers$;
 
   ngOnInit() {
-    /**
-     * Even after completing, a `ReplaySubject` will save all of the emitted values and replay them to each of its subscribers.
-     */
-    this.subscriber$ = new ReplaySubject();
+    // create an observable called 'numbers' that will emit incremental values every second
+    this.numbers$ = Observable
+      .interval(1000)
+      // apply an operator to this observable to only emit the first 5 values.
+      .take(5);
 
-    this.subscriber$.subscribe(
-      value => console.log('first subscriber:', value),
-      err => console.log(err),
-      () => console.log('first subscriber:', 'completed!'),
+    // subscribe to this observable and log the emitted values to the console
+    this.numbers$.subscribe(
+      value => console.log(value),
+      err => console.error(err),
+      () => console.info('completed'),
     );
-
-    this.subscriber$.next(1);
-    this.subscriber$.next(2);
-
-    this.subscriber$.subscribe(
-      value => console.log('second subscriber:', value),
-      err => console.log(err),
-      () => console.log('second subscriber:', 'completed!'),
-    );
-
-    this.subscriber$.next(3);
   }
 
   ngOnDestroy() {
-    this.subscriber$.unsubscribe();
+    this.numbers$.unsubscribe();
   }
 }
