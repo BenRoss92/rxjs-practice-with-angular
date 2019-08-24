@@ -6,6 +6,10 @@
  * Then take the first 5 emitted values only.
  *
  * Then create another observable stream from this previous stream that emits those values multiplied by 10.
+ * 
+ * Then filter those values by those only greater than 20.
+ * 
+ * Log the final emitted values to the console.
  *
  */
 
@@ -19,6 +23,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/operator/take';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
 
 @Component({
   selector: 'app-root',
@@ -38,7 +43,9 @@ export class AppComponent {
     this.numbers$
       .take(5)
       // creates a new observable stream that multiplies each emitted value by 10.
-      .map((number) => number * 10)
+      .map(number => number * 10)
+      // filter the emitted values by those greater than 20, then emit only these values in a new observable stream
+      .filter(number => number > 20)
 
       // subscribe to the `numbers$` observable for when it will emit values
       .subscribe(
