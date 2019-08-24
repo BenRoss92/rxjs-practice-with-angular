@@ -1,14 +1,24 @@
 /**
  * Challenge:
+ *
+ * Create an observable stream that emits values incrementally every second, starting from 0.
  * 
- * Every second, log the values 0-4 to the console, then complete the observable stream.
- * 
+ * Then take the first 5 emitted values only.
+ *
+ * Then create another observable stream from this previous stream that emits those values multiplied by 10.
+ *
  */
 
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+/**
+ * import 'interval' and `add` it to Observable's prototype
+ * N.B. use the `/add/` folder to only pull in that method to reduce the overall bundle size
+ * see https://www.learnrxjs.io/concepts/operator-imports.html
+ */
 import 'rxjs/add/observable/interval';
 import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/map';
 
 @Component({
   selector: 'app-root',
@@ -21,21 +31,29 @@ export class AppComponent {
   numbers$;
 
   ngOnInit() {
-    // create an observable called 'numbers' that will emit incremental values every second
-    this.numbers$ = Observable
-      .interval(1000)
-      // apply an operator to this observable to only emit the first 5 values.
-      .take(5);
+    // Creates an observable stream that emits values incrementally every second, starting from 0
+    this.numbers$ = Observable.interval(1000);
 
-    // subscribe to this observable and log the emitted values to the console
-    this.numbers$.subscribe(
-      value => console.log(value),
-      err => console.error(err),
-      () => console.info('completed'),
-    );
+    // creates a new observable stream, taking the first 5 emitted values only.
+    this.numbers$
+      .take(5)
+      // creates a new observable stream that multiplies each emitted value by 10.
+      .map((number) => number * 10)
+
+      // subscribe to the `numbers$` observable for when it will emit values
+      .subscribe(
+        // onNext handler - each time a value is emitted to the stream, log it to the console
+        number => console.log(number),
+        // onError handler - if an error is emitted, log it to the console
+        err => console.error(err),
+        // onCompletion handler - when stream has completed, log out a completion message to the console
+        () => console.log('stream has completed!')
+      );
+
   }
 
   ngOnDestroy() {
+    // unsubscribe from the `numbers$` stream when the component is destroyed to avoid a memory leak
     this.numbers$.unsubscribe();
   }
 }
